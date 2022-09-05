@@ -9,20 +9,37 @@ class Juego
 {
 protected:
 	int puntaje, *dirp;
+	char pantalla[100][100];
 public:
 	void play();
+	void mostrarPantalla();
+	void Jugar();
+	void Salir();
 	Juego();
 };
 
 
 Juego::Juego()
 {
-	
+	dirp=&puntaje;
 }
 
-void Juego:play()
+void Juego::play()
 {
-	
+	//que se muestre un menú con la pantalla verde, la puntuación máxima alcanzada
+	//en la última ronda y 2 opciones: Jugar y Salir
+}
+
+void Juego::mostrarPantalla()
+{
+	for(int i=0;i<15;i++)
+	{
+		for(int k=0;k<32;k++)
+		{
+			cout<<tablero[i][k];
+		}
+		cout<<endl;
+	}
 }
 
 
