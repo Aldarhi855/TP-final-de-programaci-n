@@ -7,60 +7,153 @@
 
 using namespace std;
 
-//Ancho = 80   Alto = 25  (de la consola)
-
-class Juego
+class Comida
 {
 protected:
-	int puntaje=0, *dirp;
-	char pantalla[80][25], arriba=72, izquierda=75, derecha=77, abajo=80, esc=27, tecla;
+	int xc=30, yc=15;
 public:
-	Juego();
-	void play();
+	void ponerComida();
+};
+
+class Snake:public Comida
+{
+protected:
+	int cuerpo[200][2], n=1, tam=3, xp=10, yp=12, dir=3;
+public:
+	void mostrarCuerpo();
+	void borrar();
+	void dibujar();
+	void posicion();
+	void moverse();
+	void comer();
+	bool chocar();
+};
+
+class Juego:public Snake
+{
+private:
+	int puntaje=0, *dirp;
+	char tecla;
+public:
 	void gotoxy(int, int);
-	void mostrarPantalla();
 	void OcultaCursor();
-	void opciones();
+	void mostrarPantalla();
 	void mostrarPuntaje();
-	void x();
+	void opciones();
+	void play();
 };
 
 
-Juego::Juego()
+void Comida::ponerComida()
 {
-	dirp=&puntaje;
+	gotoxy(xc, yc);
+	cout<<(char)167;
 }
 
-void Juego::play()
+void Snake::mostrarCuerpo()
 {
-	while(tecla!=esc)
+	borrar();
+	dibujar();
+}
+
+void Snake::borrar()
+{
+	gotoxy(cuerpo[n][0], cuerpo[n][1]);
+	cout<<" ";
+}
+
+void Snake::dibujar()
+{
+	for(int i=1;i<tam;i++)
 	{
-		system("color a0");
-		OcultaCursor();
-		mostrarPantalla();
-		mostrarPuntaje();
-		opciones();
-		Sleep(100);
+	gotoxy(cuerpo[i][0], cuerpo[i][1]);
+		cout<<"O";
 	}
 }
 
-void Juego::mostrarPantalla()
+
+void Snake::posicion()
 {
-	// Líneas horizontales
-	for(int i=3; i < 116; i++){
-		gotoxy (i, 1); printf ("%c", 205);
-		gotoxy(i, 25); printf ("%c", 205);
+	cuerpo[n][0]=xp;
+	cuerpo[n][1]=yp;
+	n++;
+	if(n==tam)
+	{
+		n=1;
 	}
-	//Líneas verticales
-	for(int v=2; v < 25; v++){
-		gotoxy (2,v);  printf ("%c", 186);
-		gotoxy(116,v);  printf ("%c", 186);
+	xp++;
+}
+
+void Snake::moverse()
+{
+	int tecla;
+	if(kbhit())
+	{
+		tecla=getch();
+		switch(tecla)
+		{
+		case 72:
+			if(dir!=2)
+			{
+				dir=1;
+			}
+			break;
+		case 80:
+			if(dir!=1)
+			{
+				dir=2;
+			}
+			break;
+		case 77:
+			if(dir!=4)
+			{
+				dir=3;
+			}
+			break;
+		case 75:
+			if(dir!=3)
+			{
+				dir=4;
+			}
+			break;
+		}
 	}
-	// Esquinas
-	gotoxy  (2,1);    printf ("%c", 201);
-	gotoxy (2,25);    printf ("%c", 200);
-	gotoxy (116,1);    printf ("%c", 187);
-	gotoxy(116,25);    printf ("%c", 188);
+	if(dir==1)
+	{
+		yp++;
+	}
+	 if(dir==2)
+	{
+		yp--;
+	}
+	if(dir==3)
+	{
+		xp++;
+	}
+	if(dir==4)
+	{
+		xp--;
+	}
+}
+
+void Snake::comer()
+{
+	if(xp==xc&&yp==yc)
+	{
+		tam++;
+	}
+}
+
+bool Snake::chocar()
+{
+	if(yp==1||yp==25||xp==2||xp==116)
+	{
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
 }
 
 void Juego::gotoxy(int x, int y)
@@ -81,6 +174,35 @@ void Juego::OcultaCursor()
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
 }
 
+void Juego::mostrarPantalla()
+{
+	// Líneas horizontales
+	for(int i=3; i < 116; i++)
+	{
+		gotoxy(i, 1); 
+		cout<<((char) 205);
+		gotoxy(i, 25);
+		cout<<((char) 205);
+	}
+	//Líneas verticales
+	for(int v=2; v < 25; v++)
+	{
+		gotoxy(2,v);
+		cout<<((char) 186);
+		gotoxy(116,v);
+		cout<<((char) 186);
+	}
+	// Esquinas
+	gotoxy(2,1);
+	cout<<((char) 201);
+	gotoxy(2,25);
+	cout<<((char) 200);
+	gotoxy(116,1);
+	cout<<((char) 187);
+	gotoxy(116,25);
+	cout<<((char) 188);
+}
+
 void Juego::mostrarPuntaje()
 {
 	gotoxy(2,27);
@@ -95,84 +217,30 @@ void Juego::opciones()
 	cout<<"Salir";
 }
 
-
-class Comida:public Juego
+void Juego::play()
 {
-private:
-	int xc,yc;
-public:
-	Comida();
-	void ponerComida();
-	void coords(int _x, int _y);
-	int x();
-	int y();
-};
-
-void Comida::coords(int _x, int _y) 
-{
-	xc = _x;
-	yc = _y;
-}
-
-void Comida::ponerComida()
-{
-	gotoxy(xc,yc); printf("%c",4);
-}
-
-int Comida::x()
-{
-	return xc;
-}
-
-int Comida::y()
-{
-	return yc;
-}
-
-
-class Snake:public Juego
-{
-private:
-	int cuerpo[200][2], n=1, tam=3, x=10, y=12;
-public:
-	Snake();
-	void mostrarCuerpo();
-	void borrar();
-	void dibujar();
-	void posicion();
-};
-
-void Snake::posicion()
-{
-	cuerpo[n][0]=x;
-	cuerpo[n][1]=y;
-	n++;
-	if(n==tam)
+	
+	system("color a0");
+	OcultaCursor();
+	mostrarPantalla();
+	while(tecla!=27&&chocar()==false)
 	{
-		n=1;
+		mostrarPuntaje();
+		opciones();
+		borrar();
+		posicion();
+		dibujar();
+		moverse();
+		comer();
+		Sleep(100);
 	}
-	x++;
-}
-
-void Snake::dibujar()
-{
-	for(int i=1;i<tam;i++)
-	{
-	gotoxy(cuerpo[i][0], cuerpo[i][1]);
-		cout<<"°";
-	}
-}
-
-void Snake::borrar()
-{
-	gotoxy(cuerpo[n][0], cuerpo[n][1]);
-	cout<<" ";
 }
 
 
 int main (int argc, char *argv[]) 
 {
 	Juego p;
+	
 	p.play();
 	
 	return 0;
