@@ -13,6 +13,7 @@ protected:
 	int xc=30, yc=15;
 public:
 	void ponerComida();
+	void comidaInicial();
 };
 
 class Snake:public Comida
@@ -22,8 +23,8 @@ protected:
 public:
 	void mostrarCuerpo();
 	void borrar();
-	void dibujar();
 	void posicion();
+	void dibujar();
 	void moverse();
 	void comer();
 	bool chocar();
@@ -32,27 +33,39 @@ public:
 class Juego:public Snake
 {
 private:
-	int puntaje=0, *dirp;
+	int puntaje=0, tamp=3, *dirp, velocidad=100, x=1;
 	char tecla;
 public:
 	void gotoxy(int, int);
-	void OcultaCursor();
 	void mostrarPantalla();
 	void mostrarPuntaje();
+	void configVel();
+	void sumarPuntos();
 	void opciones();
+	bool Salir();
 	void play();
 };
 
 
 void Comida::ponerComida()
 {
+	srand(time(NULL));
+	xc=rand()%115+3;
+	yc=rand()%24+3;
 	gotoxy(xc, yc);
-	cout<<(char)167;
+	cout<<(char)42;
+}
+
+void Comida::comidaInicial()
+{
+	gotoxy(xc, yc);
+	cout<<(char)42;
 }
 
 void Snake::mostrarCuerpo()
 {
 	borrar();
+	posicion();
 	dibujar();
 }
 
@@ -81,7 +94,6 @@ void Snake::posicion()
 	{
 		n=1;
 	}
-	xp++;
 }
 
 void Snake::moverse()
@@ -89,6 +101,7 @@ void Snake::moverse()
 	int tecla;
 	if(kbhit())
 	{
+		tecla=getch();
 		tecla=getch();
 		switch(tecla)
 		{
@@ -120,11 +133,11 @@ void Snake::moverse()
 	}
 	if(dir==1)
 	{
-		yp++;
+		yp--;
 	}
 	 if(dir==2)
 	{
-		yp--;
+		yp++;
 	}
 	if(dir==3)
 	{
@@ -141,19 +154,24 @@ void Snake::comer()
 	if(xp==xc&&yp==yc)
 	{
 		tam++;
+		ponerComida();
 	}
 }
 
 bool Snake::chocar()
 {
-	if(yp==1||yp==25||xp==2||xp==116)
+	if(yp==1||yp==27||xp==2||xp==118)
 	{
 		return true;
 	}
-	else 
+	for(int i=(tam-1);i>0;i--)
 	{
-		return false;
+		if(cuerpo[i][0]==xp&&cuerpo[i][1]==yp)
+		{
+			return true;
+		}
 	}
+	return false;
 }
 
 void Juego::gotoxy(int x, int y)
@@ -165,13 +183,6 @@ void Juego::gotoxy(int x, int y)
 	dwPos.Y = y;
 	hCon = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(hCon,dwPos);
-}
-
-void Juego::OcultaCursor() 
-{
-	CONSOLE_CURSOR_INFO cci = {100, FALSE}; 
-	
-	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
 }
 
 void Juego::mostrarPantalla()
@@ -209,30 +220,55 @@ void Juego::mostrarPuntaje()
 	cout<<"Puntaje: "<<puntaje<<endl;
 }
 
+void Juego::configVel()
+{
+	if(puntaje==x*20)
+	{
+		velocidad-=10;
+		x++;
+	}
+}
+
+void Juego::sumarPuntos()
+{
+	if(tam>tamp)
+	{
+		puntaje+=10;
+		tamp++;
+	}
+}
+
 void Juego::opciones()
 {
 	gotoxy(57,12);
 	cout<<"Jugar";
 	gotoxy(57,13);
 	cout<<"Salir";
+	
+}
+
+bool Juego::Salir()
+{
+	return chocar()==true;
 }
 
 void Juego::play()
 {
 	
 	system("color a0");
-	OcultaCursor();
 	mostrarPantalla();
-	while(tecla!=27&&chocar()==false)
+	opciones();
+	comidaInicial();
+	while(chocar()==false)
 	{
-		mostrarPuntaje();
-		opciones();
-		borrar();
-		posicion();
-		dibujar();
+		mostrarCuerpo();
 		moverse();
 		comer();
-		Sleep(100);
+		chocar();
+		sumarPuntos();
+		mostrarPuntaje();
+		configVel();
+		Sleep(velocidad);
 	}
 }
 
