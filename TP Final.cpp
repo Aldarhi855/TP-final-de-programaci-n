@@ -33,7 +33,8 @@ public:
 class Juego:public Snake
 {
 private:
-	int puntaje=0, tamp=3, *dirp, velocidad=100, x=1;
+	int puntaje=0, racha=0, tamp=3, *dirp, velocidad=100, x=1;
+	bool opcion;
 	char tecla;
 public:
 	void gotoxy(int, int);
@@ -160,14 +161,18 @@ void Snake::comer()
 
 bool Snake::chocar()
 {
-	if(yp==1||yp==27||xp==2||xp==118)
+	if(yp==2||yp==26||xp==3||xp==116)
 	{
+		gotoxy(55, 13);
+		cout<<"¡Perdiste!";
 		return true;
 	}
 	for(int i=(tam-1);i>0;i--)
 	{
 		if(cuerpo[i][0]==xp&&cuerpo[i][1]==yp)
 		{
+			gotoxy(55, 13);
+			cout<<"¡Perdiste!";
 			return true;
 		}
 	}
@@ -196,11 +201,11 @@ void Juego::mostrarPantalla()
 		cout<<((char) 205);
 	}
 	//Líneas verticales
-	for(int v=2; v < 25; v++)
+	for(int j=2; j < 25; j++)
 	{
-		gotoxy(2,v);
+		gotoxy(2,j);
 		cout<<((char) 186);
-		gotoxy(116,v);
+		gotoxy(116,j);
 		cout<<((char) 186);
 	}
 	// Esquinas
@@ -240,26 +245,36 @@ void Juego::sumarPuntos()
 
 void Juego::opciones()
 {
-	gotoxy(57,12);
-	cout<<"Jugar";
-	gotoxy(57,13);
-	cout<<"Salir";
-	
-}
-
-bool Juego::Salir()
-{
-	return chocar()==true;
+	system("color a0");
+	mostrarPantalla();
+	gotoxy(54,12);
+	cout<<"[1] Jugar";
+	gotoxy(54,14);
+	cout<<"[2] Salir";
+	gotoxy(51,16);
+	cout<<"Controles: flechas"<<endl;
+	gotoxy(53,17);
+	cout<<"de dirección.";
+	tecla=getch();
+	switch(tecla)
+	{
+	case 49:
+		opcion=true;
+		system("cls");
+		play();
+		break;
+	case 50:
+		opcion=false;
+		gotoxy(0, 26);
+	}
 }
 
 void Juego::play()
 {
-	
 	system("color a0");
 	mostrarPantalla();
-	opciones();
 	comidaInicial();
-	while(chocar()==false)
+	while(chocar()==false&&opcion==true)
 	{
 		mostrarCuerpo();
 		moverse();
@@ -270,6 +285,9 @@ void Juego::play()
 		configVel();
 		Sleep(velocidad);
 	}
+	gotoxy(0, 26);
+	system("pause");
+	gotoxy(0, 26);
 }
 
 
@@ -277,7 +295,7 @@ int main (int argc, char *argv[])
 {
 	Juego p;
 	
-	p.play();
+	p.opciones();
 	
 	return 0;
 }
