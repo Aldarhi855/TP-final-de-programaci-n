@@ -51,8 +51,8 @@ public:
 void Comida::ponerComida()
 {
 	srand(time(NULL));
-	xc=rand()%115+3;
-	yc=rand()%24+3;
+	xc=rand()%114+4;
+	yc=rand()%23+4;
 	gotoxy(xc, yc);
 	cout<<(char)42;
 }
